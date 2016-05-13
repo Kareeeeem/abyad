@@ -7,3 +7,7 @@ class StackError(Exception):
 
 class HeapError(Exception):
     pass
+
+
+class IntegerError(Exception):
+    pass
