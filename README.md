@@ -1,11 +1,10 @@
-# Laysa
+# Abyad
 
 A Whitespace interpreter written in Python. Purely as an exercise as I
-have never written an interpreter. Laysa means nothing in arabic.
-
-Here is the spec copied [from](http://compsoc.dur.ac.uk/whitespace/tutorial.html)
+have never written an interpreter. Abyad means white in Arabic.
 
 # Specification
+Copied from [here](http://compsoc.dur.ac.uk/whitespace/tutorial.html).
 
 The only lexical tokens in the whitespace language are Space (ASCII 32),
 Tab (ASCII 9) and Line Feed (ASCII 10).
