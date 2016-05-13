@@ -1,0 +1,9 @@
+*.swp
+*.py[cod]
+*.egg-info
+*.egg
+venv/
+dist/
+sdist/
+__pycache__/
+.cache/
