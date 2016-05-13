@@ -11,22 +11,17 @@ POS = SPACE
 NEG = TAB
 
 
+def itows(i, minus=False):
+    binary = str(bin(i))[2:]
+    sign = [NEG if minus else POS]
+    ws_digits = [SPACE if d == '0' else TAB for d in binary]
+    return ('').join(chain(sign, ws_digits, [LF]))
+
+
 def test_integer_parser():
-    ws_integers = {}
-    for i in xrange(1000):
-        binary_string = str(bin(i))[2:]
-        ws_integer_string = [SPACE if d == '0' else TAB for d in binary_string]
-        pos = ('').join(chain([POS], ws_integer_string, [LF]))
-        neg = ('').join(chain([NEG], ws_integer_string, [LF]))
-
-        ws_integers[i] = pos
-        ws_integers[i * -1] = neg
-    assert all([wstoi(value) == key for key, value in ws_integers.iteritems()])
-
-
-def test_integer_minus_parser():
-    imin5 = [NEG, TAB, SPACE, TAB, LF]
-    assert wstoi(imin5) == -5
+    assert all([wstoi(itows(i, minus=False)) == i and
+                wstoi(itows(i, minus=True)) == i * -1
+                for i in xrange(1000)])
 
 
 def test_integer_parser_not_terminated():
