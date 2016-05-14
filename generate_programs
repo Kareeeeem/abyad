@@ -1,0 +1,7 @@
+#! /usr/bin/env python
+from tests import programs
+
+
+if __name__ == '__main__':
+    for program in programs.programs:
+        programs.tows(program.program, program.name)
