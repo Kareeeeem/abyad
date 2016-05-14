@@ -2,11 +2,9 @@ import pytest
 from itertools import chain
 
 from src import exceptions
-from src.parser import wstoi
+from src.interpreter import wstoi
+from src.tokens import SPACE, TAB, LF
 
-SPACE = ' '
-TAB = '\t'
-LF = '\n'
 POS = SPACE
 NEG = TAB
 

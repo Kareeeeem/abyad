@@ -8,51 +8,51 @@ from src import exceptions
 
 
 def test_pop():
-    stack = [1, 2]
-    stack = lib.pop(stack)
-    assert stack == [1]
+    state = lib.State(stack=[1, 2])
+    state.pop()
+    assert state.stack == [1]
 
 
 def test_push():
-    stack = []
-    stack = lib.push(stack, 1)
-    assert stack == [1]
+    state = lib.State()
+    state.push(1)
+    assert state.stack == [1]
 
 
 def test_swap():
-    stack = [1, 2]
-    stack = lib.swap(stack)
-    assert stack == [2, 1]
+    state = lib.State(stack=[1, 2])
+    state.swap()
+    assert state.stack == [2, 1]
 
 
 def test_dup():
-    stack = [1, 1]
-    stack = lib.swap(stack)
-    assert stack == [1, 1]
+    state = lib.State(stack=[1, 1])
+    state.swap()
+    assert state.stack == [1, 1]
 
 
 def test_pop_empty_stack():
-    stack = []
+    state = lib.State()
     with pytest.raises(exceptions.StackError):
-        lib.pop(stack)
+        state.pop()
 
 
 def test_dup_empty_stack():
-    stack = []
+    state = lib.State()
     with pytest.raises(exceptions.StackError):
-        lib.dup(stack)
+        state.dup()
 
 
 def test_swap_empty_stack():
-    stack = []
+    state = lib.State()
     with pytest.raises(exceptions.StackError):
-        lib.swap(stack)
+        state.swap()
 
 
 def test_swap_one_item_in_stack():
-    stack = [1]
+    state = lib.State(stack=[1])
     with pytest.raises(exceptions.StackError):
-        lib.swap(stack)
+        state.swap()
 
 
 # Arithmetic
@@ -60,81 +60,69 @@ def test_swap_one_item_in_stack():
 
 
 def test_add():
-    stack = [1, 2, 3]
-    stack = lib.add(stack)
-    assert stack == [1, 5]
+    state = lib.State(stack=[1, 2, 3])
+    state.add()
+    assert state.stack == [1, 5]
 
 
 def test_mul():
-    stack = [1, 2, 3]
-    stack = lib.mul(stack)
-    assert stack == [1, 6]
+    state = lib.State(stack=[1, 2, 3])
+    state.mul()
+    assert state.stack == [1, 6]
 
 
 def test_sub():
-    stack = [1, 2, 3]
-    stack = lib.sub(stack)
-    assert stack == [1, -1]
+    state = lib.State(stack=[1, 2, 3])
+    state.sub()
+    assert state.stack == [1, -1]
 
 
 def test_div():
-    stack = [1, 6, 2]
-    stack = lib.div(stack)
-    assert stack == [1, 3]
+    state = lib.State(stack=[1, 6, 2])
+    state.div()
+    assert state.stack == [1, 3]
 
 
 def test_mod():
-    stack = [1, 5, 3]
-    stack = lib.mod(stack)
-    assert stack == [1, 2]
-
-
-def test_left_right_empty_stack():
-    stack = [1]
-    with pytest.raises(exceptions.StackError):
-        lib.get_stack_left_right(stack)
+    state = lib.State(stack=[1, 5, 3])
+    state.mod()
+    assert state.stack == [1, 2]
 
 
 # Heap access
 
 
 def test_store():
-    stack = [5, 80]
-    heap = {}
-    _, heap = lib.store(stack, heap)
-    assert heap == {5: 80}
+    state = lib.State(stack=[5, 80])
+    state.store()
+    assert state.heap == {5: 80}
 
 
 def test_store_only_one_item_in_stack():
-    stack = [5]
-    heap = {}
+    state = lib.State(stack=[5])
     with pytest.raises(exceptions.StackError):
-        lib.store(stack, heap)
+        state.store()
 
 
 def test_store_empty_stack():
-    stack = []
-    heap = {}
+    state = lib.State()
     with pytest.raises(exceptions.StackError):
-        lib.store(stack, heap)
+        state.store()
 
 
 def test_retrieve():
-    heap = {5: 80}
-    stack = [5]
-    stack, _ = lib.retrieve(stack, heap)
-    assert stack == [5, 80]
+    state = lib.State(heap={5: 80}, stack=[5])
+    state.retrieve()
+    assert state.stack == [80]
 
 
 def test_retrieve_empty_stack():
-    heap = {5: 80}
-    stack = []
+    state = lib.State(heap={5: 80})
     with pytest.raises(exceptions.StackError):
-        lib.retrieve(stack, heap)
+        state.retrieve()
 
 
 def test_retrieve_key_not_in_heap():
-    heap = {}
-    stack = [5]
+    state = lib.State(stack=[5])
     with pytest.raises(exceptions.HeapError):
-        lib.retrieve(stack, heap)
+        state.retrieve()

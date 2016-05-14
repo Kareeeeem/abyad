@@ -1,4 +1,5 @@
-'''Exceptions for lib.'''
+class EOF(Exception):
+    pass
 
 
 class StackError(Exception):
