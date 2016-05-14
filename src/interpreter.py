@@ -40,8 +40,9 @@ def get_next_instruction(ws, ptr, tokens):
                 return instruction, ptr
             else:
                 return get_next_instruction(ws, ptr, instruction.children)
-    raise EOF('File ended unexpectedly, most likely due to a syntax error or '
-              'the program was not terminated properly with \\\n\\\n\\\n.')
+    raise EOF('File or program ended unexpectedly, most likely due to a '
+              'syntax error or the program was not terminated properly with '
+              '\\n\\n\\n.')
 
 
 def set_marks(ws):
@@ -50,7 +51,10 @@ def set_marks(ws):
     marks = {}
 
     while ptr < len(ws):
-        instruction, ptr = get_next_instruction(ws, ptr, IMP)
+        try:
+            instruction, ptr = get_next_instruction(ws, ptr, IMP)
+        except EOF:
+            break
         if instruction.param_signed is not None:
             param, ptr = get_param(ws, ptr, signed=instruction.param_signed)
             if instruction.instruction == 'mark':
@@ -61,7 +65,7 @@ def set_marks(ws):
 def eval(ws, state):
     ptr = 0
     marks = set_marks(ws)
-    callstack = []
+    # callstack = []
 
     while True:
         instruction, ptr = get_next_instruction(ws, ptr, IMP)
