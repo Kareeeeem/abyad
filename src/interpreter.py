@@ -5,6 +5,28 @@ from tokens import SPACE, TAB, LF
 from instructions import Types, OpCodes, Instruction, IMP
 
 
+def write_char(c):
+    sys.stdout.write(chr(c))
+
+
+def write_num(i):
+    sys.stdout.write(str(i))
+
+
+def read_char():
+    return ord(sys.stdin.read(1))
+
+
+def read_num():
+    digits = []
+    chr = sys.stdin.read(1)
+    while chr.isdigit():
+        digits.append(chr)
+        chr = sys.stdin.read(1)
+    if digits:
+        return int(('').join(digits))
+
+
 def get_param(ws, ptr, signed=False):
     '''Return a parameter and the advanced pointer.'''
     begin = ptr
@@ -101,27 +123,23 @@ def eval(ws, state):
             state.execute(instruction.opcode, param)
 
         elif instruction == OpCodes.INC:
-            # TODO  error handling and write test case
-            c = sys.stdin.read(1)
-            state.push(ord(c))
+            state.push(read_char())
             state.store()
 
         elif instruction == OpCodes.INI:
-            # TODO  error handling and write test case
-            digits = []
-            chr = sys.stdin.read(1)
-            while chr.isdigit():
-                digits.append(chr)
-                chr = sys.stdin.read(1)
-            if digits:
-                num = int(('').join(digits))
+            num = read_num()
+            if num:
                 state.push(num)
                 state.store()
+
         elif Instruction == OpCodes.OUTC:
-            c = state.pop()
-            sys.stdout.write(chr(c))
+            write_char(state.pop())
+
         elif Instruction == OpCodes.OUTI:
-            i = state.pop()
-            sys.stdout.write(i)
+            write_num(state.pop())
 
     return state
+
+
+if __name__ == '__main__':
+    print 'hello'
