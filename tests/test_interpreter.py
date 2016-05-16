@@ -23,6 +23,7 @@ def execute_test(program):
 
 def test_ioread_program():
     # INPUT 'a1' at prompt while running tests
+    print 'input the string "a1" '
     execute_test(programs.ioread)
 
 

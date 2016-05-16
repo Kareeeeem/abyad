@@ -102,8 +102,8 @@ def eval(ws, state):
 
         elif instruction == OpCodes.INC:
             # TODO  error handling and write test case
-            chr = sys.stdin.read(1)
-            state.push(ord(chr))
+            c = sys.stdin.read(1)
+            state.push(ord(c))
             state.store()
 
         elif instruction == OpCodes.INI:
@@ -117,5 +117,11 @@ def eval(ws, state):
                 num = int(('').join(digits))
                 state.push(num)
                 state.store()
+        elif Instruction == OpCodes.OUTC:
+            c = state.pop()
+            sys.stdout.write(chr(c))
+        elif Instruction == OpCodes.OUTI:
+            i = state.pop()
+            sys.stdout.write(i)
 
     return state

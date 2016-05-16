@@ -2,11 +2,21 @@ import operator
 import exceptions
 
 
-class Stack(object):
-    ERROR = 'Stack has too few items for operation.'
+class State(object):
+    STACK_ERROR = exceptions.StackError('Stack has too few items for operation.')
+    HEAP_ERROR = exceptions.HeapError('Location not found in heap.')
 
-    def __init__(self, stack=None):
+    def __init__(self, stack=None, heap=None):
         self.stack = stack or []
+        self.heap = heap or {}
+
+    def execute(self, opcode, param=None):
+        if param:
+            return getattr(self, opcode)(param)
+        else:
+            return getattr(self, opcode)()
+
+    # stack manipulation
 
     def push(self, value):
         self.stack.append(value)
@@ -15,19 +25,36 @@ class Stack(object):
         try:
             return self.stack.pop()
         except IndexError:
-            self.raise_()
+            raise self.STACK_ERROR
 
     def dup(self):
         try:
             self.stack.append(self.stack[-1])
         except IndexError:
-            self.raise_()
+            raise self.STACK_ERROR
 
     def swap(self):
         try:
             self.stack[-1], self.stack[-2] = self.stack[-2], self.stack[-1]
         except IndexError:
-            self.raise_()
+            raise self.STACK_ERROR
+
+    # heap access
+
+    def store(self):
+        value = self.pop()
+        address = self.pop()
+        self.heap[address] = value
+
+    def load(self):
+        address = self.pop()
+        try:
+            value = self.heap[address]
+            self.push(value)
+        except KeyError:
+            raise self.HEAP_ERROR
+
+    # arithmetic
 
     def calc(self, operator):
         right = self.pop()
@@ -35,90 +62,17 @@ class Stack(object):
         value = operator(left, right)
         self.push(value)
 
-    def raise_(self):
-        raise exceptions.StackError(self.ERROR)
-
-
-class Heap(object):
-    ERROR = 'Location not found in heap.'
-
-    def __init__(self, heap=None):
-        self.heap = heap or {}
-
-    def store(self, address, value):
-        self.heap[address] = value
-
-    def load(self, address):
-        try:
-            return self.heap[address]
-        except KeyError:
-            self.raise_()
-
-    def raise_(self):
-        raise exceptions.HeapError(self.ERROR)
-
-
-class State(object):
-    def __init__(self, stack=None, heap=None):
-        self._stack = Stack(stack)
-        self._heap = Heap(heap)
-
-    def execute(self, opcode, param=None):
-        operation = getattr(self, opcode, None)
-        if not operation:
-            raise AttributeError
-        if param:
-            return operation(param)
-        else:
-            return operation()
-
-    @property
-    def stack(self):
-        return self._stack.stack
-
-    @property
-    def heap(self):
-        return self._heap.heap
-
-    # stack manipulation
-
-    def push(self, value):
-        self._stack.push(value)
-
-    def pop(self):
-        return self._stack.pop()
-
-    def dup(self):
-        self._stack.dup()
-
-    def swap(self):
-        self._stack.swap()
-
-    # heap access
-
-    def store(self):
-        value = self.pop()
-        address = self.pop()
-        self._heap.store(address, value)
-
-    def load(self):
-        address = self.pop()
-        value = self._heap.load(address)
-        self.push(value)
-
-    # arithmetic
-
     def add(self):
-        self._stack.calc(operator.add)
+        self.calc(operator.add)
 
     def div(self):
-        self._stack.calc(operator.div)
+        self.calc(operator.div)
 
     def mod(self):
-        self._stack.calc(operator.mod)
+        self.calc(operator.mod)
 
     def mul(self):
-        self._stack.calc(operator.mul)
+        self.calc(operator.mul)
 
     def sub(self):
-        self._stack.calc(operator.sub)
+        self.calc(operator.sub)
