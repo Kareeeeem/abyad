@@ -132,10 +132,10 @@ def eval(ws, state):
                 state.push(num)
                 state.store()
 
-        elif Instruction == OpCodes.OUTC:
+        elif instruction == OpCodes.OUTC:
             write_char(state.pop())
 
-        elif Instruction == OpCodes.OUTI:
+        elif instruction == OpCodes.OUTI:
             write_num(state.pop())
 
     return state
