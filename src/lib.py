@@ -48,7 +48,7 @@ class Heap(object):
     def store(self, address, value):
         self.heap[address] = value
 
-    def retrieve(self, address):
+    def load(self, address):
         try:
             return self.heap[address]
         except KeyError:
@@ -63,6 +63,15 @@ class State(object):
         self._stack = Stack(stack)
         self._heap = Heap(heap)
 
+    def execute(self, opcode, param=None):
+        operation = getattr(self, opcode, None)
+        if not operation:
+            raise AttributeError
+        if param:
+            return operation(param)
+        else:
+            return operation()
+
     @property
     def stack(self):
         return self._stack.stack
@@ -70,6 +79,8 @@ class State(object):
     @property
     def heap(self):
         return self._heap.heap
+
+    # stack manipulation
 
     def push(self, value):
         self._stack.push(value)
@@ -83,15 +94,19 @@ class State(object):
     def swap(self):
         self._stack.swap()
 
+    # heap access
+
     def store(self):
         value = self.pop()
         address = self.pop()
         self._heap.store(address, value)
 
-    def retrieve(self):
+    def load(self):
         address = self.pop()
-        value = self._heap.retrieve(address)
+        value = self._heap.load(address)
         self.push(value)
+
+    # arithmetic
 
     def add(self):
         self._stack.calc(operator.add)

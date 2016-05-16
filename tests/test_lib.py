@@ -110,19 +110,19 @@ def test_store_empty_stack():
         state.store()
 
 
-def test_retrieve():
+def test_load():
     state = lib.State(heap={5: 80}, stack=[5])
-    state.retrieve()
+    state.load()
     assert state.stack == [80]
 
 
-def test_retrieve_empty_stack():
+def test_load_empty_stack():
     state = lib.State(heap={5: 80})
     with pytest.raises(exceptions.StackError):
-        state.retrieve()
+        state.load()
 
 
-def test_retrieve_key_not_in_heap():
+def test_load_key_not_in_heap():
     state = lib.State(stack=[5])
     with pytest.raises(exceptions.HeapError):
-        state.retrieve()
+        state.load()

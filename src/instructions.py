@@ -1,55 +1,93 @@
 '''This module defines dictionary mappings to instructions.'''
-
 from collections import namedtuple
 
-import utils
+from utils import join
 from tokens import SPACE, TAB, LF
 
-Instruction = namedtuple('Instruction', 'instruction type param_signed children')
+Instruction = namedtuple('Instruction', 'opcode param_type')
 
 
 class Types:
-    STACK_MANIPULATION = 'STACK_MANIPULATION'
-    HEAP_ACCESS = 'HEAP_ACCESS'
-    FLOW_CONTROL = 'FLOW_CONTROL'
-    ARITHMETIC = 'ARITHMETIC'
-    IMP = 'IMP'
+    INTEGER = 'signed'
+    LABEL = 'unsigned'
 
+
+class OpCodes:
+    # stack manipulation
+    PUSH = Instruction('push', Types.INTEGER)
+    POP = Instruction('pop', None)
+    SWAP = Instruction('swap', None)
+    DUP = Instruction('dup', None)
+
+    # arithmetic
+    ADD = Instruction('add', None)
+    SUB = Instruction('sub', None)
+    MUL = Instruction('mul', None)
+    DIV = Instruction('div', None)
+    MOD = Instruction('mod', None)
+
+    # heap access
+    STORE = Instruction('store', None)
+    LOAD = Instruction('load', None)
+
+    # flow control
+    MARK = Instruction('mark', Types.LABEL)
+    CALL = Instruction('call', Types.LABEL)
+    JUMP = Instruction('j', Types.LABEL)
+    JUMP_Z = Instruction('jz', Types.LABEL)
+    JUMP_N = Instruction('jn', Types.LABEL)
+    END = Instruction('end', None)
+    EXIT = Instruction('exit', None)
+
+    # IO
+    INC = Instruction('read_char', None)
+    INI = Instruction('read_num', None)
+    OUTC = Instruction('write_char', None)
+    OUTI = Instruction('write_num', None)
 
 STACK_MANIPULATION = {
-    SPACE: Instruction('push', Types.STACK_MANIPULATION, True, None),
-    utils.join(LF, SPACE): Instruction('dup', Types.STACK_MANIPULATION, None, None),
-    utils.join(LF, TAB): Instruction('swap', Types.STACK_MANIPULATION, None, None),
-    utils.join(LF, LF): Instruction('pop', Types.STACK_MANIPULATION, None, None),
+    SPACE: OpCodes.PUSH,
+    join(LF, SPACE): OpCodes.DUP,
+    join(LF, TAB): OpCodes.SWAP,
+    join(LF, LF): OpCodes.POP,
 }
 
 ARITHMETIC = {
-    utils.join(SPACE, SPACE): Instruction('add', Types.ARITHMETIC, None, None),
-    utils.join(SPACE, TAB): Instruction('sub', Types.ARITHMETIC, None, None),
-    utils.join(SPACE, LF): Instruction('mul', Types.ARITHMETIC, None, None),
-    utils.join(TAB, SPACE): Instruction('div', Types.ARITHMETIC, None, None),
-    utils.join(TAB, TAB): Instruction('mod', Types.ARITHMETIC, None, None),
+    join(SPACE, SPACE): OpCodes.ADD,
+    join(SPACE, TAB): OpCodes.SUB,
+    join(SPACE, LF): OpCodes.MUL,
+    join(TAB, SPACE): OpCodes.DIV,
+    join(TAB, TAB): OpCodes.MOD,
 }
 
 FLOW_CONTROL = {
-    utils.join(SPACE, SPACE): Instruction('mark', Types.FLOW_CONTROL, False, None),
-    utils.join(SPACE, LF): Instruction('jump', Types.FLOW_CONTROL, False, None),
-    utils.join(TAB, SPACE): Instruction('jump_if_0', Types.FLOW_CONTROL, False, None),
-    utils.join(TAB, TAB): Instruction('jump_if_neg', Types.FLOW_CONTROL, False, None),
-    utils.join(LF, LF): Instruction('exit', Types.FLOW_CONTROL, None, None),
-    utils.join(SPACE, TAB): Instruction('call', Types.FLOW_CONTROL, False, None),
-    utils.join(TAB, LF): Instruction('end', Types.FLOW_CONTROL, None, None),
+    join(SPACE, SPACE): OpCodes.MARK,
+    join(SPACE, LF): OpCodes.JUMP,
+    join(TAB, SPACE): OpCodes.JUMP_Z,
+    join(TAB, TAB): OpCodes.JUMP_N,
+    join(LF, LF): OpCodes.EXIT,
+    join(SPACE, TAB): OpCodes.CALL,
+    join(TAB, LF): OpCodes.END,
 }
 
 HEAP_ACCESS = {
-    SPACE: Instruction('store', Types.HEAP_ACCESS, None, None),
-    TAB: Instruction('retrieve', Types.HEAP_ACCESS, None, None),
+    SPACE: OpCodes.STORE,
+    TAB: OpCodes.LOAD,
 }
 
+
+IO = {
+    join(SPACE, SPACE): OpCodes.OUTC,
+    join(SPACE, TAB): OpCodes.OUTI,
+    join(TAB, SPACE): OpCodes.INC,
+    join(TAB, TAB): OpCodes.INI,
+}  # TODO
+
+# INSTRUCTION MODIFICATION PARAMETERS
 IMP = {
-    SPACE: Instruction(None, Types.IMP, None, STACK_MANIPULATION),
-    LF: Instruction(None, Types.IMP, None, FLOW_CONTROL),
-    utils.join(TAB, SPACE): Instruction(None, Types.IMP, None, ARITHMETIC),
-    utils.join(TAB, TAB): Instruction(None, Types.IMP, None, HEAP_ACCESS),
-    # utils.join(TAB, LF): IO,
+    SPACE: STACK_MANIPULATION,
+    LF: FLOW_CONTROL,
+    join(TAB, SPACE): ARITHMETIC,
+    join(TAB, TAB): HEAP_ACCESS,
+    join(TAB, LF): IO,
 }

@@ -4,8 +4,38 @@ from collections import namedtuple
 from src.tokens import SPACE, TAB, LF
 from src import utils
 
-Program = namedtuple('Program', 'name program stack')
+Program = namedtuple('Program', 'name program stack heap')
 programs = []
+
+ioread = Program(
+    name='ioread',
+    program=utils.join(
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
+        SPACE, SPACE, SPACE, TAB, SPACE, SPACE, TAB, LF,  # push 9
+        TAB, LF, TAB, SPACE,  # read char
+        TAB, LF, TAB, TAB,  # read int
+        LF, LF, LF,  # terminate
+    ),
+    stack=[],
+    heap={9: ord('a'), 5: 1}
+)
+programs.append(ioread)
+
+subroutine = Program(
+    name='subroutine',
+    program=utils.join(
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
+        LF, SPACE, LF, TAB, SPACE, TAB, TAB, SPACE, TAB, LF,  # call routine
+        LF, LF, LF,  # terminate
+        LF, SPACE, SPACE, TAB, SPACE, TAB, TAB, SPACE, TAB, LF,  # mark routine
+        TAB, SPACE, SPACE, LF,  # mul
+        LF, TAB, LF  # end routine
+    ),
+    stack=[25],
+    heap={}
+)
+programs.append(subroutine)
 
 stack_manipulation = Program(
     'stack_manipulation',
@@ -19,7 +49,8 @@ stack_manipulation = Program(
         SPACE, LF, LF,  # pop
         LF, LF, LF,  # terminate
     ),
-    stack=[7, 5, 9]
+    stack=[7, 5, 9],
+    heap={}
 )
 
 programs.append(stack_manipulation)
@@ -39,7 +70,8 @@ arithmetic = Program(
         TAB, SPACE, TAB, SPACE,  # div - result = 9
         LF, LF, LF,  # terminate
     ),
-    stack=[9]
+    stack=[9],
+    heap={}
 )
 programs.append(arithmetic)
 
@@ -61,7 +93,8 @@ count = Program(
         SPACE, LF, LF,
         LF, LF, LF,
     ),
-    stack=[]
+    stack=[],
+    heap={}
 )
 
 
@@ -76,7 +109,8 @@ terminate = Program(
         LF, LF, LF,  # terminate
         SPACE, SPACE, SPACE, TAB, TAB, TAB, LF,  # attempt to push again
     ),
-    stack=[7, 5]
+    stack=[7, 5],
+    heap={}
 )
 programs.append(terminate)
 
@@ -92,7 +126,8 @@ heap = Program(
         TAB, SPACE, SPACE, TAB,  # sub  result = 2
         LF, LF, LF,  # terminate
     ),
-    stack=[2]
+    stack=[2],
+    heap={5: 7}
 )
 programs.append(heap)
 

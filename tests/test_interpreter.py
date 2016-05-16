@@ -10,41 +10,41 @@ for program in programs.programs:
 
 def read(name):
     basedir = os.path.abspath(os.path.dirname(__file__))
-    with open(os.path.join(basedir, name + '.wso'), 'rb') as f:
+    with open(os.path.join(basedir, name + '.ws'), 'rb') as f:
         program = f.read()
     return program
 
 
-def test_stack_manipulation_program():
+def execute_test(program):
     state = lib.State()
-    program = read(programs.stack_manipulation.name)
-    interpreter.eval(program, state)
-    assert state.stack == programs.stack_manipulation.stack
+    interpreter.eval(read(program.name), state)
+    assert state.stack == program.stack and state.heap == program.heap
+
+
+def test_ioread_program():
+    # INPUT 'a1' at prompt while running tests
+    execute_test(programs.ioread)
+
+
+def test_routine_program():
+    execute_test(programs.subroutine)
+
+
+def test_stack_manipulation_program():
+    execute_test(programs.stack_manipulation)
 
 
 def test_stack_arithmetic_program():
-    state = lib.State()
-    program = read(programs.arithmetic.name)
-    interpreter.eval(program, state)
-    assert state.stack == programs.arithmetic.stack
+    execute_test(programs.arithmetic)
 
 
 def test_heap_program():
-    state = lib.State()
-    program = read(programs.heap.name)
-    interpreter.eval(program, state)
-    assert state.stack == programs.heap.stack
+    execute_test(programs.heap)
 
 
 def test_count_program():
-    state = lib.State()
-    program = read(programs.count.name)
-    interpreter.eval(program, state)
-    assert state.stack == programs.count.stack
+    execute_test(programs.count)
 
 
 def test_program_termination():
-    state = lib.State()
-    program = read(programs.terminate.name)
-    interpreter.eval(program, state)
-    assert state.stack == programs.terminate.stack
+    execute_test(programs.terminate)

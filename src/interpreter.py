@@ -1,6 +1,8 @@
+import sys
+
 from exceptions import EOF, IntegerError
 from tokens import SPACE, TAB, LF
-from instructions import Types, IMP
+from instructions import Types, OpCodes, Instruction, IMP
 
 
 def get_param(ws, ptr, signed=False):
@@ -33,16 +35,20 @@ def wstoi(ws, signed=True):
 
 
 def get_next_instruction(ws, ptr, tokens):
-    for token, instruction in tokens.iteritems():
+    for token, instruction_or_set in tokens.iteritems():
         if ws[ptr:].startswith(token):
             ptr += len(token)
-            if not instruction.children:
-                return instruction, ptr
+            if isinstance(instruction_or_set, Instruction):
+                return instruction_or_set, ptr
             else:
-                return get_next_instruction(ws, ptr, instruction.children)
+                return get_next_instruction(ws, ptr, instruction_or_set)
     raise EOF('File or program ended unexpectedly, most likely due to a '
               'syntax error or the program was not terminated properly with '
               '\\n\\n\\n.')
+
+
+def get_signed(instr):
+    return instr.param_type == Types.INTEGER
 
 
 def set_marks(ws):
@@ -55,9 +61,9 @@ def set_marks(ws):
             instruction, ptr = get_next_instruction(ws, ptr, IMP)
         except EOF:
             break
-        if instruction.param_signed is not None:
-            param, ptr = get_param(ws, ptr, signed=instruction.param_signed)
-            if instruction.instruction == 'mark':
+        if instruction.param_type is not None:
+            param, ptr = get_param(ws, ptr, signed=get_signed(instruction))
+            if instruction == OpCodes.MARK:
                 marks[param] = ptr
     return marks
 
@@ -65,36 +71,51 @@ def set_marks(ws):
 def eval(ws, state):
     ptr = 0
     marks = set_marks(ws)
-    # callstack = []
+    callstack = []
 
     while True:
         instruction, ptr = get_next_instruction(ws, ptr, IMP)
 
-        if instruction.param_signed is not None:
-            param, ptr = get_param(ws, ptr, signed=instruction.param_signed)
-        else:
-            param = None
+        param = None
+        if instruction.param_type is not None:
+            param, ptr = get_param(ws, ptr, signed=get_signed(instruction))
 
-        if instruction.type == Types.FLOW_CONTROL:
-            if instruction.instruction == 'exit':
-                break
-            elif instruction.instruction == 'jump_if_neg' and state.pop() < 0:
-                ptr = marks[param]
-            elif instruction.instruction == 'jump_if_0' and state.pop() == 0:
-                ptr = marks[param]
-            elif instruction.instruction == 'jump':
-                ptr = marks[param]
-            # elif instruction.instruction == 'call':
-            #     callstack.append(ptr)
-            #     ptr = marks[param]
-            # elif instruction.instruction == 'end':
-            #     ptr = callstack.pop()
+        # FLOW CONTROL
+        if instruction == OpCodes.EXIT:
+            break
 
-        elif instruction.type in [Types.STACK_MANIPULATION, Types.ARITHMETIC,
-                                  Types.HEAP_ACCESS]:
-            if param:
-                getattr(state, instruction.instruction)(param)
-            else:
-                getattr(state, instruction.instruction)()
+        elif instruction == OpCodes.END:
+            ptr = callstack.pop()
+
+        elif any([(instruction == OpCodes.JUMP_N and state.pop() < 0),
+                  (instruction == OpCodes.JUMP_Z and state.pop() == 0),
+                  (instruction == OpCodes.CALL or callstack.append(ptr)),
+                  instruction == OpCodes.JUMP]):
+            ptr = marks[param]
+
+        # STACK MANIPULATION / HEAP ACCESS / ARITHMETIC
+        elif instruction in [OpCodes.PUSH, OpCodes.POP, OpCodes.SWAP,
+                             OpCodes.DUP, OpCodes.ADD, OpCodes.SUB,
+                             OpCodes.MUL, OpCodes.DIV, OpCodes.MOD,
+                             OpCodes.STORE, OpCodes.LOAD]:
+            state.execute(instruction.opcode, param)
+
+        elif instruction == OpCodes.INC:
+            # TODO  error handling and write test case
+            chr = sys.stdin.read(1)
+            state.push(ord(chr))
+            state.store()
+
+        elif instruction == OpCodes.INI:
+            # TODO  error handling and write test case
+            digits = []
+            chr = sys.stdin.read(1)
+            while chr.isdigit():
+                digits.append(chr)
+                chr = sys.stdin.read(1)
+            if digits:
+                num = int(('').join(digits))
+                state.push(num)
+                state.store()
 
     return state
