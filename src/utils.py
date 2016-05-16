@@ -1,6 +1,5 @@
 from itertools import chain
 from tokens import SPACE, TAB, LF
-POS, NEG = SPACE, TAB
 
 
 def join(*ws):
@@ -19,8 +18,10 @@ def print_ws(ws):
     print visible
 
 
-def itows(i, minus=False):
+def itows(i, minus=False, label=False):
     binary = str(bin(i))[2:]
-    sign = [NEG if minus else POS]
+    sign = []
+    if not label:
+        sign = [TAB if minus else SPACE]
     ws_digits = [SPACE if d == '0' else TAB for d in binary]
     return ('').join(chain(sign, ws_digits, [LF]))

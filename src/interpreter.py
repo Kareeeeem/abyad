@@ -1,9 +1,11 @@
 import sys
 
 from exc import EOF, IntegerError
-from tokens import SPACE, TAB, LF
-from instructions import Types, OpCodes, Instruction, IMP
+from instructions import ParamTypes, instructionset
 from lib import State
+from tokens import SPACE, TAB, LF, PUSH, DUP, SWAP, POP, ADD, SUB, MUL, DIV, \
+    MOD, MARK, JUMP, JUMP_Z, JUMP_N, EXIT, CALL, END, STORE, LOAD, OUTC, OUTI, \
+    INC, INI
 
 
 def write_char(c):
@@ -30,13 +32,13 @@ def read_num():
         raise IntegerError('Expecter an integer')
 
 
-def get_param(ws, ptr, signed=False):
+def get_param(ws, ip, signed=False):
     '''Return a parameter and the advanced pointer.'''
-    begin = ptr
-    while ws[ptr] != LF:
-        ptr += 1
-    ptr += 1  # advance past the LF
-    return wstoi(ws[begin:ptr], signed=True), ptr
+    begin = ip
+    while ws[ip] != LF:
+        ip += 1
+    ip += 1  # advance past the LF
+    return wstoi(ws[begin:ip], signed=True), ip
 
 
 def wstoi(ws, signed=True):
@@ -59,86 +61,82 @@ def wstoi(ws, signed=True):
     return integer
 
 
-def get_next_instruction(ws, ptr, tokens):
-    for token, instruction_or_set in tokens.iteritems():
-        if ws[ptr:].startswith(token):
-            ptr += len(token)
-            if isinstance(instruction_or_set, Instruction):
-                return instruction_or_set, ptr
-            else:
-                return get_next_instruction(ws, ptr, instruction_or_set)
+def get_next_instruction(ws, ip, instructions):
+    for ins in instructions:
+        if ws[ip:].startswith(ins.token):
+            ip += len(ins.token)
+            return ins, ip
     raise EOF('File or program ended unexpectedly, most likely due to a '
               'syntax error or the program was not terminated properly with '
               '\\n\\n\\n.')
 
 
 def get_signed(instr):
-    return instr.param_type == Types.INTEGER
+    return instr.param_type == ParamTypes.INTEGER
 
 
 def set_marks(ws):
     '''Walk the entire file looking for marks.'''
-    ptr = 0
+    ip = 0
     marks = {}
 
-    while ptr < len(ws):
+    while ip < len(ws):
         try:
-            instruction, ptr = get_next_instruction(ws, ptr, IMP)
+            ins, ip = get_next_instruction(ws, ip, instructionset)
         except EOF:
             break
-        if instruction.param_type is not None:
-            param, ptr = get_param(ws, ptr, signed=get_signed(instruction))
-            if instruction == OpCodes.MARK:
-                marks[param] = ptr
+        if ins.param_type is not None:
+            param, ip = get_param(ws, ip, signed=get_signed(ins))
+            if ins.token == MARK:
+                marks[param] = ip
     return marks
 
 
 def eval(ws, state=None):
-    ptr = 0
+    ip = 0
     state = state or State()
     marks = set_marks(ws)
     callstack = []
 
     while True:
-        instruction, ptr = get_next_instruction(ws, ptr, IMP)
+        ins, ip = get_next_instruction(ws, ip, instructionset)
 
         param = None
-        if instruction.param_type is not None:
-            param, ptr = get_param(ws, ptr, signed=get_signed(instruction))
+        if ins.param_type is not None:
+            param, ip = get_param(ws, ip, signed=get_signed(ins))
 
-        # FLOW CONTROL
-        if instruction == OpCodes.EXIT:
+        if ins.token == EXIT:
             break
 
-        elif instruction == OpCodes.END:
-            ptr = callstack.pop()
+        elif ins.token == END:
+            ip = callstack.pop()
 
-        elif any([(instruction == OpCodes.JUMP_N and state.pop() < 0),
-                  (instruction == OpCodes.JUMP_Z and state.pop() == 0),
-                  (instruction == OpCodes.CALL or callstack.append(ptr)),
-                  instruction == OpCodes.JUMP]):
-            ptr = marks[param]
+        elif any([(ins.token == JUMP_N and state.pop() < 0),
+                  (ins.token == JUMP_Z and state.pop() == 0),
+                  ins.token == JUMP]):
+            ip = marks[param]
 
-        # STACK MANIPULATION / HEAP ACCESS / ARITHMETIC
-        elif instruction in [OpCodes.PUSH, OpCodes.POP, OpCodes.SWAP,
-                             OpCodes.DUP, OpCodes.ADD, OpCodes.SUB,
-                             OpCodes.MUL, OpCodes.DIV, OpCodes.MOD,
-                             OpCodes.STORE, OpCodes.LOAD]:
-            state.execute(instruction.opcode, param)
+        elif ins.token == CALL:
+            callstack.append(ip)
+            ip = marks[param]
 
-        # IO
-        elif instruction == OpCodes.INC:
+        elif ins.token in [PUSH, POP, SWAP, DUP,  # stack manipulation
+                           ADD, SUB, MUL, DIV, MOD,  # arithmetic
+                           STORE, LOAD]:  # heap access
+            state.execute(ins.opcode, param)
+
+        elif ins.token == INC:
             state.push(read_char())
             state.store()
 
-        elif instruction == OpCodes.INI:
+        elif ins.token == INI:
             state.push(read_num())
             state.store()
 
-        elif instruction == OpCodes.OUTC:
+        elif ins.token == OUTC:
             write_char(state.pop())
 
-        elif instruction == OpCodes.OUTI:
+        elif ins.token == OUTI:
             write_num(state.pop())
 
     return state

@@ -1,8 +1,10 @@
 import os
 from collections import namedtuple
 
-from src.tokens import SPACE, TAB, LF
-from src import utils
+from src.utils import join, itows
+from src.tokens import SPACE, TAB, LF, PUSH, DUP, SWAP, POP, ADD, SUB, MUL, \
+    DIV, MOD, MARK, JUMP, JUMP_Z, JUMP_N, EXIT, CALL, END, STORE, LOAD, OUTC, \
+    OUTI, INC, INI
 
 
 Program = namedtuple('Program', 'name program stack heap')
@@ -10,13 +12,7 @@ programs = []
 
 ioread = Program(
     name='ioread',
-    program=utils.join(
-        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
-        SPACE, SPACE, SPACE, TAB, SPACE, SPACE, TAB, LF,  # push 9
-        TAB, LF, TAB, SPACE,  # read char
-        TAB, LF, TAB, TAB,  # read int
-        LF, LF, LF,  # terminate
-    ),
+    program=join(PUSH, itows(5), PUSH, itows(9), INC, INI, EXIT),
     stack=[],
     heap={9: ord('a'), 5: 1}
 )
@@ -24,13 +20,7 @@ programs.append(ioread)
 
 iowrite = Program(
     name='iowrite',
-    program=utils.join(
-        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
-        SPACE, SPACE, SPACE, TAB, TAB, SPACE, SPACE, SPACE, SPACE, TAB, LF,  # push 97
-        TAB, LF, SPACE, SPACE,  # write char
-        TAB, LF, SPACE, TAB,  # write int
-        LF, LF, LF,  # terminate
-    ),
+    program=join(PUSH, itows(5), PUSH, itows(97), OUTC, OUTI, EXIT),
     stack=[],
     heap={}
 )
@@ -38,14 +28,14 @@ programs.append(iowrite)
 
 subroutine = Program(
     name='subroutine',
-    program=utils.join(
-        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
-        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
-        LF, SPACE, LF, TAB, SPACE, TAB, TAB, SPACE, TAB, LF,  # call routine
-        LF, LF, LF,  # terminate
-        LF, SPACE, SPACE, TAB, SPACE, TAB, TAB, SPACE, TAB, LF,  # mark routine
-        TAB, SPACE, SPACE, LF,  # mul
-        LF, TAB, LF  # end routine
+    program=join(
+        PUSH, itows(5),
+        PUSH, itows(5),
+        CALL, itows(45, label=True),
+        EXIT,
+        MARK, itows(45, label=True),
+        MUL,
+        END,
     ),
     stack=[25],
     heap={}
@@ -54,7 +44,7 @@ programs.append(subroutine)
 
 stack_manipulation = Program(
     'stack_manipulation',
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
         SPACE, SPACE, SPACE, TAB, TAB, TAB, LF,  # push 7
         SPACE, LF, TAB,  # swap
@@ -72,7 +62,7 @@ programs.append(stack_manipulation)
 
 arithmetic = Program(
     'arithmetic',
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
         SPACE, SPACE, SPACE, TAB, TAB, TAB, LF,  # push 7
         TAB, SPACE, SPACE, SPACE,  # add - result = 12
@@ -94,7 +84,7 @@ count = Program(
     'count',
     # this is the example program from compsoc.dur.ac.uk/whitespace/tutorial.html
     # without the IO.
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, LF,
         LF, SPACE, SPACE, SPACE, TAB, SPACE, SPACE, SPACE, SPACE, TAB, TAB, LF,
         SPACE, SPACE, SPACE, TAB, LF,
@@ -117,7 +107,7 @@ programs.append(count)
 
 terminate = Program(
     'terminate',
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,
         SPACE, SPACE, SPACE, TAB, TAB, TAB, LF,
         SPACE, LF, TAB,
@@ -131,7 +121,7 @@ programs.append(terminate)
 
 heap = Program(
     'heap',
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
         SPACE, SPACE, SPACE, TAB, TAB, TAB, LF,  # push 7
         TAB, TAB, SPACE,  # store 7 at 5
@@ -149,7 +139,7 @@ programs.append(heap)
 # this is the example program from compsoc.dur.ac.uk/whitespace/tutorial.html
 iocount = Program(
     'iocount',
-    utils.join(
+    join(
         SPACE, SPACE, SPACE, TAB, LF,
         LF, SPACE, SPACE, SPACE, TAB, SPACE, SPACE, SPACE, SPACE, TAB, TAB, LF,
         SPACE, LF, SPACE,
