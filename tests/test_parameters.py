@@ -1,18 +1,12 @@
 import pytest
-from itertools import chain
 
+from src import exc
+from src.utils import itows
 from src.interpreter import wstoi
 from src.tokens import SPACE, TAB, LF
 
 POS = SPACE
 NEG = TAB
-
-
-def itows(i, minus=False):
-    binary = str(bin(i))[2:]
-    sign = [NEG if minus else POS]
-    ws_digits = [SPACE if d == '0' else TAB for d in binary]
-    return ('').join(chain(sign, ws_digits, [LF]))
 
 
 def test_integer_parser():

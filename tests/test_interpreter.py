@@ -1,4 +1,6 @@
 import os
+import mock
+
 from src import interpreter
 from src import lib
 import programs
@@ -21,10 +23,21 @@ def execute_test(program):
     assert state.stack == program.stack and state.heap == program.heap
 
 
-def test_ioread_program():
-    # INPUT 'a1' at prompt while running tests
-    print 'input the string "a1" '
-    execute_test(programs.ioread)
+def test_ioread_char():
+    state = lib.State()
+    program = programs.ioread
+    with mock.patch('sys.stdin.read', side_effect=['a', '1', '\n']):
+        interpreter.eval(read(program.name), state)
+        assert state.stack == program.stack and state.heap == program.heap
+
+
+def test_iowrite(capfd):
+    state = lib.State()
+    program = programs.iowrite
+    interpreter.eval(read(program.name), state)
+    assert state.stack == program.stack and state.heap == program.heap
+    out, err = capfd.readouterr()
+    assert out == 'a5'
 
 
 def test_routine_program():

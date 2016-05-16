@@ -4,6 +4,7 @@ from collections import namedtuple
 from src.tokens import SPACE, TAB, LF
 from src import utils
 
+
 Program = namedtuple('Program', 'name program stack heap')
 programs = []
 
@@ -20,6 +21,20 @@ ioread = Program(
     heap={9: ord('a'), 5: 1}
 )
 programs.append(ioread)
+
+iowrite = Program(
+    name='iowrite',
+    program=utils.join(
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,  # push 5
+        SPACE, SPACE, SPACE, TAB, TAB, SPACE, SPACE, SPACE, SPACE, TAB, LF,  # push 97
+        TAB, LF, SPACE, SPACE,  # write char
+        TAB, LF, SPACE, TAB,  # write int
+        LF, LF, LF,  # terminate
+    ),
+    stack=[],
+    heap={}
+)
+programs.append(iowrite)
 
 subroutine = Program(
     name='subroutine',
