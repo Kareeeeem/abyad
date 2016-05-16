@@ -1,10 +1,10 @@
 import operator
-import exceptions
+import exc
 
 
 class State(object):
-    STACK_ERROR = exceptions.StackError('Stack has too few items for operation.')
-    HEAP_ERROR = exceptions.HeapError('Location not found in heap.')
+    STACK_ERROR = exc.StackError('Stack has too few items for operation.')
+    HEAP_ERROR = exc.HeapError('Location not found in heap.')
 
     def __init__(self, stack=None, heap=None):
         self.stack = stack or []

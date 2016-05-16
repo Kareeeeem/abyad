@@ -81,7 +81,7 @@ IO = {
     join(SPACE, TAB): OpCodes.OUTI,
     join(TAB, SPACE): OpCodes.INC,
     join(TAB, TAB): OpCodes.INI,
-}  # TODO
+}
 
 # INSTRUCTION MODIFICATION PARAMETERS
 IMP = {

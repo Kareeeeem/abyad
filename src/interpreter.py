@@ -1,6 +1,6 @@
 import sys
 
-from exceptions import EOF, IntegerError
+from exc import EOF, IntegerError
 from tokens import SPACE, TAB, LF
 from instructions import Types, OpCodes, Instruction, IMP
 

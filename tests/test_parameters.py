@@ -1,7 +1,6 @@
 import pytest
 from itertools import chain
 
-from src import exceptions
 from src.interpreter import wstoi
 from src.tokens import SPACE, TAB, LF
 
@@ -25,19 +24,19 @@ def test_integer_parser():
 def test_integer_parser_not_terminated():
     # integers should end with linefeed
     i = [POS, TAB, SPACE, TAB]
-    with pytest.raises(exceptions.IntegerError):
+    with pytest.raises(exc.IntegerError):
         wstoi(i)
 
 
 def test_integer_parser_unsigned():
     # integers should begin with SPACE or TAB sign.
     i = [LF, TAB, SPACE, TAB]
-    with pytest.raises(exceptions.IntegerError):
+    with pytest.raises(exc.IntegerError):
         wstoi(i)
 
 
 def test_integer_invalid_digits():
     # integers should begin with SPACE or TAB sign.
     i = [TAB, TAB, LF, TAB, LF]
-    with pytest.raises(exceptions.IntegerError):
+    with pytest.raises(exc.IntegerError):
         wstoi(i)

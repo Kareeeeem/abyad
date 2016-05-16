@@ -1,7 +1,7 @@
 import pytest
 
 from src import lib
-from src import exceptions
+from src import exc
 
 # Stack manipulation
 # ==================
@@ -33,25 +33,25 @@ def test_dup():
 
 def test_pop_empty_stack():
     state = lib.State()
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.pop()
 
 
 def test_dup_empty_stack():
     state = lib.State()
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.dup()
 
 
 def test_swap_empty_stack():
     state = lib.State()
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.swap()
 
 
 def test_swap_one_item_in_stack():
     state = lib.State(stack=[1])
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.swap()
 
 
@@ -100,13 +100,13 @@ def test_store():
 
 def test_store_only_one_item_in_stack():
     state = lib.State(stack=[5])
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.store()
 
 
 def test_store_empty_stack():
     state = lib.State()
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.store()
 
 
@@ -118,11 +118,11 @@ def test_load():
 
 def test_load_empty_stack():
     state = lib.State(heap={5: 80})
-    with pytest.raises(exceptions.StackError):
+    with pytest.raises(exc.StackError):
         state.load()
 
 
 def test_load_key_not_in_heap():
     state = lib.State(stack=[5])
-    with pytest.raises(exceptions.HeapError):
+    with pytest.raises(exc.HeapError):
         state.load()
