@@ -13,13 +13,14 @@ setup(
     author='Mohammed Kareem',
     author_email='kareeeeem@gmail.com',
     license='MIT',
-    # packages=find_packages(),
     packages=['src'],
     install_requires=[
         'pytest'
     ],
-    entry_points="""
-        [console_scripts]
-    """,
+    entry_points={
+        'console_scripts': [
+            'abyad = src.__main__:main'
+        ]
+    },
 )
 

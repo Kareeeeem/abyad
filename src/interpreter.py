@@ -3,6 +3,7 @@ import sys
 from exc import EOF, IntegerError
 from tokens import SPACE, TAB, LF
 from instructions import Types, OpCodes, Instruction, IMP
+from lib import State
 
 
 def write_char(c):
@@ -19,12 +20,14 @@ def read_char():
 
 def read_num():
     digits = []
-    chr = sys.stdin.read(1)
-    while chr.isdigit():
-        digits.append(chr)
-        chr = sys.stdin.read(1)
-    if digits:
+    c = sys.stdin.read(1)
+    while c.isdigit():
+        digits.append(c)
+        c = sys.stdin.read(1)
+    try:
         return int(('').join(digits))
+    except ValueError:
+        raise IntegerError('Expecter an integer')
 
 
 def get_param(ws, ptr, signed=False):
@@ -90,8 +93,9 @@ def set_marks(ws):
     return marks
 
 
-def eval(ws, state):
+def eval(ws, state=None):
     ptr = 0
+    state = state or State()
     marks = set_marks(ws)
     callstack = []
 
@@ -122,15 +126,14 @@ def eval(ws, state):
                              OpCodes.STORE, OpCodes.LOAD]:
             state.execute(instruction.opcode, param)
 
+        # IO
         elif instruction == OpCodes.INC:
             state.push(read_char())
             state.store()
 
         elif instruction == OpCodes.INI:
-            num = read_num()
-            if num:
-                state.push(num)
-                state.store()
+            state.push(read_num())
+            state.store()
 
         elif instruction == OpCodes.OUTC:
             write_char(state.pop())
@@ -139,7 +142,3 @@ def eval(ws, state):
             write_num(state.pop())
 
     return state
-
-
-if __name__ == '__main__':
-    print 'hello'

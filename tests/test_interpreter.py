@@ -17,11 +17,7 @@ def read(name):
     return program
 
 
-def execute_test(program):
-    state = lib.State()
-    interpreter.eval(read(program.name), state)
-    assert state.stack == program.stack and state.heap == program.heap
-
+# IO tests
 
 def test_ioread_char():
     state = lib.State()
@@ -38,6 +34,23 @@ def test_iowrite(capfd):
     assert state.stack == program.stack and state.heap == program.heap
     out, err = capfd.readouterr()
     assert out == 'a5'
+
+
+def test_iocount(capfd):
+    state = lib.State()
+    program = programs.iocount
+    interpreter.eval(read(program.name), state)
+    assert state.stack == program.stack and state.heap == program.heap
+    out, err = capfd.readouterr()
+    assert out == '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n'
+
+
+# Everything without IO
+
+def execute_test(program):
+    state = lib.State()
+    interpreter.eval(read(program.name), state)
+    assert state.stack == program.stack and state.heap == program.heap
 
 
 def test_routine_program():

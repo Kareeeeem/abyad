@@ -146,6 +146,32 @@ heap = Program(
 )
 programs.append(heap)
 
+# this is the example program from compsoc.dur.ac.uk/whitespace/tutorial.html
+iocount = Program(
+    'iocount',
+    utils.join(
+        SPACE, SPACE, SPACE, TAB, LF,
+        LF, SPACE, SPACE, SPACE, TAB, SPACE, SPACE, SPACE, SPACE, TAB, TAB, LF,
+        SPACE, LF, SPACE,
+        TAB, LF, SPACE, TAB,
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, SPACE, LF,
+        TAB, LF, SPACE, SPACE,
+        SPACE, SPACE, SPACE, TAB, LF,
+        TAB, SPACE, SPACE, SPACE,
+        SPACE, LF, SPACE,
+        SPACE, SPACE, SPACE, TAB, SPACE, TAB, TAB, LF,
+        TAB, SPACE, SPACE, TAB,
+        LF, TAB, SPACE, SPACE, TAB, SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,
+        LF, SPACE, LF, SPACE, TAB, SPACE, SPACE, SPACE, SPACE, TAB, TAB, LF,
+        LF, SPACE, SPACE, SPACE, TAB, SPACE, SPACE, SPACE, TAB, SPACE, TAB, LF,
+        SPACE, LF, LF,
+        LF, LF, LF,
+    ),
+    stack=[],
+    heap={}
+)
+programs.append(iocount)
+
 
 def tows(program, name):
     basedir = os.path.abspath(os.path.dirname(__file__))
