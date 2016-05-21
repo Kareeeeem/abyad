@@ -12,7 +12,7 @@ setup(
     long_description=read('README.md'),
     author='Mohammed Kareem',
     author_email='kareeeeem@gmail.com',
-    license='do what you want',
+    license='unlicense',
     packages=['src'],
     install_requires=[
         'pytest'
