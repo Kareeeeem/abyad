@@ -2,7 +2,7 @@ import sys
 
 from exc import EOF, IntegerError
 from instructions import ParamTypes, instructionset
-from lib import State
+from state import State
 from utils import strip_comments
 import tokens
 

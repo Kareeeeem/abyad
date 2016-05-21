@@ -2,7 +2,7 @@ import os
 import mock
 
 from src import interpreter
-from src import lib
+from src.lib import State
 import programs
 
 
@@ -20,7 +20,7 @@ def read(name):
 # IO tests
 
 def test_ioread_char():
-    state = lib.State()
+    state = State()
     program = programs.ioread
     with mock.patch('sys.stdin.read', side_effect=['a', '1', '\n']):
         interpreter.eval(read(program.name), state)
@@ -28,7 +28,7 @@ def test_ioread_char():
 
 
 def test_iowrite(capfd):
-    state = lib.State()
+    state = State()
     program = programs.iowrite
     interpreter.eval(read(program.name), state)
     assert state.stack == program.stack and state.heap == program.heap
@@ -37,7 +37,7 @@ def test_iowrite(capfd):
 
 
 def test_iocount(capfd):
-    state = lib.State()
+    state = State()
     program = programs.iocount
     interpreter.eval(read(program.name), state)
     assert state.stack == program.stack and state.heap == program.heap
@@ -48,7 +48,7 @@ def test_iocount(capfd):
 # Everything without IO
 
 def execute_test(program):
-    state = lib.State()
+    state = State()
     interpreter.eval(read(program.name), state)
     assert state.stack == program.stack and state.heap == program.heap
 
