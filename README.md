@@ -3,12 +3,17 @@
 A Whitespace interpreter written in Python. Purely as an exercise as I
 have never written an interpreter. Abyad means white in Arabic.
 
+Was unsure on how to implement comments so for now everything that is
+not a <space>, <tab> or <lf> simply get's stripped. That's it.
+
 ## Usage
 
 `abyad program.ws`
 
 There are some useless programs that you can generate with
 `generate_programs` which will land in the tests folder.
+
+
 
 
 # Specification
