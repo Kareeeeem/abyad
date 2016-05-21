@@ -3,9 +3,7 @@ import sys
 from exc import EOF, IntegerError
 from instructions import ParamTypes, instructionset
 from lib import State
-from tokens import SPACE, TAB, LF, PUSH, DUP, SWAP, POP, ADD, SUB, MUL, DIV, \
-    MOD, MARK, JUMP, JUMP_Z, JUMP_N, EXIT, CALL, END, STORE, LOAD, OUTC, OUTI, \
-    INC, INI
+import tokens
 
 
 def write_char(c):
@@ -35,7 +33,7 @@ def read_num():
 def get_param(ws, ip, signed=False):
     '''Return a parameter and the advanced pointer.'''
     begin = ip
-    while ws[ip] != LF:
+    while ws[ip] != tokens.LF:
         ip += 1
     ip += 1  # advance past the LF
     return wstoi(ws[begin:ip], signed=True), ip
@@ -49,13 +47,14 @@ def wstoi(ws, signed=True):
     param signed bool: indicating the param is signed to indicate pos or neg.
     returns: Integer
     '''
-    if not (ws[-1] == LF and all([d in (SPACE, TAB) for d in ws[:-1]])):
+    if not (ws[-1] == tokens.LF and
+            all([d in (tokens.SPACE, tokens.TAB) for d in ws[:-1]])):
         raise IntegerError('Invalid integer')
 
     begin = 1 if signed else 0
-    integer = int(('').join(['1' if d == TAB else '0' for d in ws[begin:-1]]), 2)
+    integer = int(('').join(['1' if d == tokens.TAB else '0' for d in ws[begin:-1]]), 2)
 
-    if signed and ws[0] == TAB:
+    if signed and ws[0] == tokens.TAB:
         integer *= -1
 
     return integer
@@ -87,7 +86,7 @@ def set_marks(ws):
             break
         if ins.param_type is not None:
             param, ip = get_param(ws, ip, signed=get_signed(ins))
-            if ins.token == MARK:
+            if ins.token == tokens.MARK:
                 marks[param] = ip
     return marks
 
@@ -105,38 +104,38 @@ def eval(ws, state=None):
         if ins.param_type is not None:
             param, ip = get_param(ws, ip, signed=get_signed(ins))
 
-        if ins.token == EXIT:
+        if ins.token == tokens.EXIT:
             break
 
-        elif ins.token == END:
+        elif ins.token == tokens.END:
             ip = callstack.pop()
 
-        elif any([(ins.token == JUMP_N and state.pop() < 0),
-                  (ins.token == JUMP_Z and state.pop() == 0),
-                  ins.token == JUMP]):
+        elif any([(ins.token == tokens.JUMP_N and state.pop() < 0),
+                  (ins.token == tokens.JUMP_Z and state.pop() == 0),
+                  ins.token == tokens.JUMP]):
             ip = marks[param]
 
-        elif ins.token == CALL:
+        elif ins.token == tokens.CALL:
             callstack.append(ip)
             ip = marks[param]
 
-        elif ins.token in [PUSH, POP, SWAP, DUP,  # stack manipulation
-                           ADD, SUB, MUL, DIV, MOD,  # arithmetic
-                           STORE, LOAD]:  # heap access
+        elif ins.token in [tokens.PUSH, tokens.POP, tokens.SWAP, tokens.DUP,  # stack manipulation
+                           tokens.ADD, tokens.SUB, tokens.MUL, tokens.DIV, tokens.MOD,  # arithmetic
+                           tokens.STORE, tokens.LOAD]:  # heap access
             state.execute(ins.opcode, param)
 
-        elif ins.token == INC:
+        elif ins.token == tokens.INC:
             state.push(read_char())
             state.store()
 
-        elif ins.token == INI:
+        elif ins.token == tokens.INI:
             state.push(read_num())
             state.store()
 
-        elif ins.token == OUTC:
+        elif ins.token == tokens.OUTC:
             write_char(state.pop())
 
-        elif ins.token == OUTI:
+        elif ins.token == tokens.OUTI:
             write_num(state.pop())
 
     return state
