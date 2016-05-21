@@ -42,6 +42,23 @@ subroutine = Program(
 )
 programs.append(subroutine)
 
+comments_stack_manipulation = Program(
+    'comments_stack_manipulation',
+    join(
+        SPACE, 'PUSH', SPACE, '5', SPACE, TAB, SPACE, TAB, LF,  # push 5
+        SPACE, 'AND', SPACE, 'THEN', SPACE, 'PUSH', TAB, '7', TAB, TAB, LF,  # push 7
+        SPACE, 'SWAP', LF, 'THE', TAB, 'TOP',  # swap
+        SPACE, 'TWO', LF, 'ITEMS', SPACE, 'AND',  # duplicate
+        SPACE, 'DUPLICATE', SPACE, 'AND', SPACE, 'PUSH', TAB, '9', SPACE, SPACE, TAB, LF,  # push 9
+        SPACE, 'SWAP', LF, 'AGAIN', TAB,  # swap
+        SPACE, 'AND', LF, 'POP', LF,  # pop
+        LF, LF, LF,  # terminate
+    ),
+    stack=[7, 5, 9],
+    heap={}
+)
+programs.append(comments_stack_manipulation)
+
 stack_manipulation = Program(
     'stack_manipulation',
     join(

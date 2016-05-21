@@ -2,6 +2,11 @@ from itertools import chain
 from tokens import SPACE, TAB, LF
 
 
+def strip_comments(program):
+    '''Only keep TAB, SPACE and LF in a program.'''
+    return ('').join(char for char in program if char in [SPACE, TAB, LF])
+
+
 def join(*ws):
     return ('').join(ws)
 

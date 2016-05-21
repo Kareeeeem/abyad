@@ -3,6 +3,7 @@ import sys
 from exc import EOF, IntegerError
 from instructions import ParamTypes, instructionset
 from lib import State
+from utils import strip_comments
 import tokens
 
 
@@ -91,7 +92,9 @@ def set_marks(ws):
     return marks
 
 
-def eval(ws, state=None):
+def eval(program, state=None):
+    ws = strip_comments(program)
+
     ip = 0
     state = state or State()
     marks = set_marks(ws)

@@ -73,5 +73,9 @@ def test_count_program():
     execute_test(programs.count)
 
 
+def test_comment_program():
+    execute_test(programs.comments_stack_manipulation)
+
+
 def test_program_termination():
     execute_test(programs.terminate)
