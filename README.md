@@ -8,7 +8,7 @@ have never written an interpreter. Abyad means white in Arabic.
 `abyad program.ws`
 
 There are some useless programs that you can generate with
-`generate_programs` which will land the tests folder.
+`generate_programs` which will land in the tests folder.
 
 
 # Specification
