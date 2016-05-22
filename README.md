@@ -1,7 +1,10 @@
 # Abyad
 
-A Whitespace interpreter written in Python. Purely as an exercise as I
-have never written an interpreter. Abyad means white in Arabic.
+A [Whitespace](http://web.archive.org/web/20150623025348/http://compsoc.dur.ac.uk/whitespace/)
+interpreter written in Python (2.7). Whitespace is a
+programming language that only accepts `<space>,` `<tab>` or `<lf>`. See
+the specification below. This is done purely as an exercise as I have
+never written an interpreter. Abyad means white in Arabic.
 
 Was unsure on how to implement comments so for now everything that is
 not a `<space>,` `<tab>` or `<lf>` simply get's stripped. That's it.
