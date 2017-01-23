@@ -1,6 +1,6 @@
 import pytest
 
-from src.lib import State
+from src.state import State
 from src import exc
 
 # Stack manipulation

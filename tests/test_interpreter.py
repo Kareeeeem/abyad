@@ -2,7 +2,7 @@ import os
 import mock
 
 from src import interpreter
-from src.lib import State
+from src.state import State
 import programs
 
 
